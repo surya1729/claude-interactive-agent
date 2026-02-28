@@ -29,6 +29,49 @@ demo.py  →  pi (TUI)  →  python.ts extension  →  kernel_exec.py  →  Jupy
 - **`kernel_exec.py`** manages a persistent Jupyter kernel — first call starts it (~3s), subsequent calls reuse it (~50ms)
 - Variables, imports, and state persist across tool calls within a session
 
+## Features Available in the Tool
+
+### Built-in Pi Tools
+These are always available regardless of extensions:
+
+| Tool    | What it does                        |
+|---------|-------------------------------------|
+| `bash`  | Run shell commands                  |
+| `read`  | Read files                          |
+| `write` | Create files                        |
+| `edit`  | Edit files                          |
+| `grep`  | Search file contents                |
+| `find`  | Find files by pattern               |
+
+### Python Tool (via `python.ts` extension)
+Executes Python code in a **persistent Jupyter kernel** — state, variables, and imports survive across calls.
+
+#### How the LLM uses it
+
+At startup, pi registers the `python` tool and its description with the LLM. When you type a prompt:
+
+```
+startup:
+  pi registers python tool → LLM sees tool description
+
+on prompt "list all my github repos":
+  LLM calls python tool
+    → runs: from libs import sdk; sdk.list()     # discover available libs
+    → runs: sdk.help("github")                   # see github API
+    → runs: from libs import github
+            github.list_repos()                  # fetch repos
+    → returns results to user
+```
+
+#### libs/ — available Python libraries
+
+| Library    | What it does                                      |
+|------------|---------------------------------------------------|
+| `github`   | Wrapper over `gh` CLI — repos, issues, PRs, CI   |
+
+> To add a new library (e.g. Gmail), just drop `gmail.py` into `worker/libs/`.
+> The LLM discovers it automatically via `sdk.list()` — no changes to `python.ts` needed.
+
 ## Prerequisites
 
 - **Node.js** (v18+)
