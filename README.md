@@ -1,159 +1,144 @@
-# Claude Interactive Agent
+# Interactive Agent using Pi
 
-An interactive CLI agent built with the Claude Agent SDK that maintains conversation history and enables natural back-and-forth dialogue with Claude.
+An interactive CLI agent powered by [pi](https://github.com/badlogic/pi-mono) that gives an LLM a persistent Python execution environment via a Jupyter kernel.
 
-## Features
-
-- 💬 **Interactive Conversation Loop** - Continuous chat with context retention
-- 🧠 **Conversation History** - Remembers previous exchanges (last 10 messages)
-- 🛠️ **File System Tools** - Built-in access to Read, Edit, Glob, and Grep tools
-- 🔄 **Multi-Turn Conversations** - Natural back-and-forth dialogue
-- ⚡ **Async Streaming** - Real-time response streaming
-- 🎯 **Smart Tool Usage** - Claude automatically uses the right tools for the task
-
-## Prerequisites
-
-- Python 3.8+
-- Claude Code CLI (authenticated)
-- Claude Agent SDK
-
-## Installation
-
-1. Clone the repository:
-```bash
-git clone https://github.com/yourusername/claude-interactive-agent.git
-cd claude-interactive-agent
-```
-
-2. Install dependencies:
-```bash
-pip install -r requirements.txt
-```
-
-3. Ensure Claude Code CLI is installed and authenticated:
-```bash
-claude --version
-```
-
-## Usage
-
-Run the interactive agent:
-```bash
-python agent.py
-```
-
-### Example Conversation
+## Project Structure
 
 ```
-============================================================
-Interactive Claude Agent - Conversation Mode
-Type 'exit', 'quit', or 'done' to end the conversation
-============================================================
-
-👤 You: Review utils.py for bugs
-
-🤖 Claude: I found 3 bugs in utils.py...
-1. ZeroDivisionError in calculate_average()
-2. Missing input validation
-3. KeyError in get_user_name()
-
-What would you like to do?
-
-------------------------------------------------------------
-
-👤 You: Fix all bugs
-
-🤖 Claude: I'll fix all the bugs now...
-[Using tool: Edit]
-Done! All bugs have been fixed.
-
-------------------------------------------------------------
-
-👤 You: exit
-👋 Ending conversation. Goodbye!
-```
-
-## Configuration
-
-### Allowed Tools
-
-You can customize which tools Claude can use by modifying the `allowed_tools` list in `agent.py`:
-
-```python
-options=ClaudeAgentOptions(
-    allowed_tools=["Read", "Edit", "Glob", "Grep", "WebFetch"],
-)
-```
-
-Available tools:
-- `Read` - Read files
-- `Edit` - Edit files
-- `Write` - Create new files
-- `Glob` - Search for files by pattern
-- `Grep` - Search file contents
-- `WebFetch` - Fetch web content
-- `Bash` - Execute shell commands
-
-### Permission Modes
-
-Set permission mode for automatic approval:
-
-```python
-options=ClaudeAgentOptions(
-    allowed_tools=["Read", "Edit", "Glob"],
-    permission_mode="acceptEdits"  # Auto-approve edits
-)
-```
-
-Options:
-- `None` (default) - Ask for permission
-- `"acceptEdits"` - Auto-approve Read/Edit/Write
-- `"ask"` - Prompt for all tools
-- `"auto"` - Auto-approve all (use with caution!)
-
-### Conversation History Limit
-
-Adjust how many messages to keep in context (default: 10):
-
-```python
-context = "\n".join(conversation_history[-10:])  # Change 10 to desired number
+interactive-agent-using-pi/
+├── worker/
+│   ├── demo.py                  # Entry point — launches the pi TUI
+│   ├── extensions/
+│   │   └── python.ts            # Pi extension: registers the `python` tool
+│   └── core/
+│       ├── kernel_exec.py       # Manages a persistent Jupyter kernel
+│       └── pi_rpc.py            # Python client for pi (interactive + RPC modes)
+├── requirements.txt             # Python dependencies
+├── package.json                 # Node dependencies (pi, typebox)
+└── venv/                        # Python virtual environment (gitignored)
 ```
 
 ## How It Works
 
-1. **Conversation History** - Stores all user and Claude messages
-2. **Context Building** - Passes recent conversation to each query
-3. **Tool Execution** - Claude automatically uses tools based on the task
-4. **Streaming Responses** - Displays Claude's thinking in real-time
-5. **Interactive Loop** - Continues until you type 'exit'
-
-## Production Usage
-
-For production environments, you'll need to provide an API key explicitly:
-
-```python
-options=ClaudeAgentOptions(
-    allowed_tools=["Read", "Edit", "Glob"],
-    api_key=os.getenv("ANTHROPIC_API_KEY")  # Set via environment variable
-)
+```
+demo.py  →  pi (TUI)  →  python.ts extension  →  kernel_exec.py  →  Jupyter kernel
 ```
 
-Get your API key from [Anthropic Console](https://console.anthropic.com/).
+- **`demo.py`** launches pi with the `python.ts` extension loaded
+- **`python.ts`** registers a `python` tool the LLM can call
+- **`kernel_exec.py`** manages a persistent Jupyter kernel — first call starts it (~3s), subsequent calls reuse it (~50ms)
+- Variables, imports, and state persist across tool calls within a session
+
+## Prerequisites
+
+- **Node.js** (v18+)
+- **Python 3.10+**
+- **pi** installed globally:
+  ```bash
+  npm install -g @mariozechner/pi-coding-agent
+  ```
+- An API key from a supported provider (OpenRouter, Anthropic, OpenAI, etc.)
+
+## Setup
+
+### 1. Clone the repo
+
+```bash
+git clone https://github.com/surya1729/claude-interactive-agent.git
+cd interactive-agent-using-pi
+```
+
+### 2. Create and activate the Python venv
+
+```bash
+python -m venv venv
+source venv/Scripts/activate   # Windows (Git Bash)
+# or
+source venv/bin/activate        # macOS/Linux
+```
+
+### 3. Install Python dependencies
+
+```bash
+pip install -r requirements.txt
+```
+
+### 4. Install Node dependencies
+
+```bash
+npm install
+```
+
+### 5. Set your API key
+
+Set the environment variable for your provider (example: OpenRouter):
+
+```bash
+export OPENROUTER_API_KEY=your-key-here
+```
+
+Or store it permanently in `~/.pi/agent/auth.json`:
+
+```json
+{
+  "openrouter": { "type": "api_key", "key": "your-key-here" }
+}
+```
+
+| Provider   | Environment Variable   |
+|------------|------------------------|
+| OpenRouter | `OPENROUTER_API_KEY`   |
+| Anthropic  | `ANTHROPIC_API_KEY`    |
+| OpenAI     | `OPENAI_API_KEY`       |
+| Gemini     | `GEMINI_API_KEY`       |
+| Groq       | `GROQ_API_KEY`         |
+
+## Running
+
+```bash
+cd worker
+python demo.py --model openrouter/anthropic/claude-haiku-4-5
+```
+
+This opens the pi TUI. Type any prompt — the LLM will use the `python` tool to execute code in the persistent kernel.
+
+### Options
+
+```
+python demo.py [--model MODEL] [--cwd DIR]
+
+--model   Model ID to use (default: anthropic/claude-haiku-4.5)
+--cwd     Working directory for the agent (default: current dir)
+```
+
+### Example models
+
+```bash
+# OpenRouter
+python demo.py --model openrouter/anthropic/claude-haiku-4-5
+python demo.py --model openrouter/openai/gpt-4o-mini
+
+# Anthropic direct
+python demo.py --model anthropic/claude-haiku-4-5
+
+# Groq
+python demo.py --model groq/llama-3.3-70b-versatile
+```
 
 ## Troubleshooting
 
-### "Permission denied" errors
-- Make sure tools are included in `allowed_tools`
-- Check `permission_mode` setting
+### `No module named 'jupyter_client'`
+The venv is missing Python dependencies. Run:
+```bash
+source venv/Scripts/activate
+pip install -r requirements.txt
+```
 
-### "API key not found"
-- Ensure Claude Code CLI is authenticated: `claude doctor`
-- For production, set `ANTHROPIC_API_KEY` environment variable
+### `No API key found for <provider>`
+Set the environment variable for your provider — see the table above.
 
-### Conversation ends unexpectedly
-- Don't press Enter without typing (will prompt to try again)
-- Use explicit 'exit', 'quit', or 'done' to end
+### `No module named 'jupyter_client'` in kernel but venv is active
+`kernel_exec.py` uses the venv's Python directly via the path in `python.ts`. Make sure the venv exists at `venv/` in the project root.
 
-## Acknowledgments
-
-Built with [Claude Agent SDK](https://github.com/anthropics/claude-agent-sdk) by Anthropic.
+### Pi opens but python tool always fails
+Check that `venv/Scripts/python.exe` (Windows) or `venv/bin/python` (macOS/Linux) exists. The path in `worker/extensions/python.ts` (line 8) must match your OS.

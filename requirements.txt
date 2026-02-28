@@ -1,1 +1,5 @@
 claude-agent-sdk
+
+# Jupyter kernel (worker/core/kernel_exec.py)
+jupyter_client
+ipykernel

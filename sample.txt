@@ -1,1 +1,0 @@
-TODO: Can you hit example.com website and see what is present in the webpage and give me a summary of that

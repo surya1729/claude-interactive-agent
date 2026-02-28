@@ -1,0 +1,230 @@
+<mxfile host="app.diagrams.net" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36" version="29.5.6">
+  <diagram name="Worker Flow" id="worker-flow">
+    <mxGraphModel dx="2066" dy="1184" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1650" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <!-- ===== NODES ===== -->
+
+        <!-- User -->
+        <mxCell id="n-user" parent="1"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=13;"
+          value="&lt;b&gt;User&lt;/b&gt;&lt;br&gt;types a prompt"
+          vertex="1">
+          <mxGeometry height="60" width="200" x="370" y="40" as="geometry" />
+        </mxCell>
+
+        <!-- demo.py -->
+        <mxCell id="n-demo" parent="1"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=13;"
+          value="&lt;b&gt;demo.py&lt;/b&gt;&lt;br&gt;Entry point"
+          vertex="1">
+          <mxGeometry height="60" width="200" x="370" y="150" as="geometry" />
+        </mxCell>
+
+        <!-- pi_rpc.py -->
+        <mxCell id="n-pirpc" parent="1"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=13;"
+          value="&lt;b&gt;core/pi_rpc.py&lt;/b&gt;&lt;br&gt;run_interactive()"
+          vertex="1">
+          <mxGeometry height="60" width="200" x="370" y="260" as="geometry" />
+        </mxCell>
+
+        <!-- Pi Process — large box showing the agent loop -->
+        <mxCell id="n-pi" parent="1"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=13;verticalAlign=top;"
+          value="&lt;b&gt;Pi Process&lt;/b&gt; — TypeScript agent (TUI mode)&lt;br&gt;&lt;br&gt;&lt;font color=&apos;#7a6300&apos; style=&apos;font-size:11px;&apos;&gt;agent-loop.js :: runLoop()&lt;br&gt;while hasMoreToolCalls:&lt;br&gt;&amp;nbsp;&amp;nbsp;1. streamAssistantResponse() → Anthropic API&lt;br&gt;&amp;nbsp;&amp;nbsp;2. tool_use? → tools.find(&apos;python&apos;).execute(code)&lt;br&gt;&amp;nbsp;&amp;nbsp;3. append tool result to messages[] → repeat&lt;br&gt;break when stop_reason = end_turn&lt;/font&gt;"
+          vertex="1">
+          <mxGeometry height="190" width="430" x="255" y="370" as="geometry" />
+        </mxCell>
+
+        <!-- Claude LLM -->
+        <mxCell id="n-claude" parent="1"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=13;"
+          value="&lt;b&gt;Claude LLM&lt;/b&gt;&lt;br&gt;Anthropic API"
+          vertex="1">
+          <mxGeometry height="60" width="200" x="370" y="640" as="geometry" />
+        </mxCell>
+
+        <!-- extensions/python.ts -->
+        <mxCell id="n-pyts" parent="1"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=13;"
+          value="&lt;b&gt;extensions/python.ts&lt;/b&gt;&lt;br&gt;pi.registerTool(&apos;python&apos;, execute)&lt;br&gt;stored in Pi&apos;s tools[] at startup"
+          vertex="1">
+          <mxGeometry height="70" width="245" x="850" y="385" as="geometry" />
+        </mxCell>
+
+        <!-- core/kernel_exec.py -->
+        <mxCell id="n-kernexec" parent="1"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=13;"
+          value="&lt;b&gt;core/kernel_exec.py&lt;/b&gt;&lt;br&gt;start_kernel() / connect_to_kernel()&lt;br&gt;sys.path.insert(0, WORKER_DIR)"
+          vertex="1">
+          <mxGeometry height="70" width="245" x="850" y="520" as="geometry" />
+        </mxCell>
+
+        <!-- Jupyter Kernel -->
+        <mxCell id="n-kernel" parent="1"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=13;"
+          value="&lt;b&gt;Jupyter Kernel&lt;/b&gt;&lt;br&gt;Persistent Python runtime&lt;br&gt;sys.path has WORKER_DIR → libs/ importable&lt;br&gt;Variables survive across all tool calls"
+          vertex="1">
+          <mxGeometry height="80" width="255" x="845" y="660" as="geometry" />
+        </mxCell>
+
+        <!-- libs/sdk.py -->
+        <mxCell id="n-sdk" parent="1"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=12;"
+          value="&lt;b&gt;libs/sdk.py&lt;/b&gt;&lt;br&gt;sdk.list() / sdk.help()&lt;br&gt;Tool discovery"
+          vertex="1">
+          <mxGeometry height="70" width="185" x="710" y="820" as="geometry" />
+        </mxCell>
+
+        <!-- libs/github.py -->
+        <mxCell id="n-github" parent="1"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=12;"
+          value="&lt;b&gt;libs/github.py&lt;/b&gt;&lt;br&gt;list_repos() / list_prs() etc&lt;br&gt;wraps gh CLI subprocess"
+          vertex="1">
+          <mxGeometry height="70" width="185" x="990" y="820" as="geometry" />
+        </mxCell>
+
+        <!-- logs/libs_calls.log -->
+        <mxCell id="n-log" parent="1"
+          style="shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;fontSize=11;fillColor=#f5f5f5;strokeColor=#666666;fontColor=#333333;size=15;"
+          value="&lt;b&gt;logs/libs_calls.log&lt;/b&gt;&lt;br&gt;tail -f to watch live"
+          vertex="1">
+          <mxGeometry height="55" width="200" x="855" y="960" as="geometry" />
+        </mxCell>
+
+        <!-- ===== EDGES ===== -->
+
+        <!-- User → demo.py -->
+        <mxCell id="e1" edge="1" parent="1" source="n-user" target="n-demo"
+          style="edgeStyle=orthogonalEdgeStyle;fontSize=11;"
+          value="prompt">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- demo.py → pi_rpc.py -->
+        <mxCell id="e2" edge="1" parent="1" source="n-demo" target="n-pirpc"
+          style="edgeStyle=orthogonalEdgeStyle;fontSize=11;"
+          value="run_interactive(model, extensions=[python.ts])">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- pi_rpc.py → Pi Process -->
+        <mxCell id="e3" edge="1" parent="1" source="n-pirpc" target="n-pi"
+          style="edgeStyle=orthogonalEdgeStyle;fontSize=11;"
+          value="subprocess.run(pi.cmd --model ... -e python.ts)">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Pi → python.ts  [startup: load extension, dashed gray] -->
+        <mxCell id="e4" edge="1" parent="1" source="n-pi" target="n-pyts"
+          style="edgeStyle=orthogonalEdgeStyle;dashed=1;fontSize=11;strokeColor=#b8860b;exitX=1;exitY=0.25;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;"
+          value="startup: loads -e extension&lt;br&gt;(one-time)">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Pi → Claude  [each turn: send messages[]] -->
+        <mxCell id="e5" edge="1" parent="1" source="n-pi" target="n-claude"
+          style="edgeStyle=orthogonalEdgeStyle;fontSize=11;"
+          value="messages[] to Anthropic API (each turn)">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Claude → Pi  [response: tool_use or end_turn, dashed red, loops left side] -->
+        <mxCell id="e6" edge="1" parent="1" source="n-claude" target="n-pi"
+          style="edgeStyle=orthogonalEdgeStyle;dashed=1;fontSize=11;strokeColor=#b85450;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=1;entryDx=0;entryDy=0;"
+          value="tool_use: python {code:&apos;...&apos;}&lt;br&gt;OR end_turn">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="290" y="670" />
+              <mxPoint x="290" y="555" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <!-- Pi → python.ts  [per-turn: execute tool, solid red] -->
+        <mxCell id="e7" edge="1" parent="1" source="n-pi" target="n-pyts"
+          style="edgeStyle=orthogonalEdgeStyle;fontSize=11;strokeColor=#b85450;exitX=1;exitY=0.75;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;"
+          value="tools.find(&apos;python&apos;).execute(code)&lt;br&gt;[when tool_use received]">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- python.ts → kernel_exec.py -->
+        <mxCell id="e8" edge="1" parent="1" source="n-pyts" target="n-kernexec"
+          style="edgeStyle=orthogonalEdgeStyle;fontSize=11;"
+          value="execFileSync(python.exe, [kernel_exec.py, code])">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- kernel_exec.py → Jupyter Kernel -->
+        <mxCell id="e9" edge="1" parent="1" source="n-kernexec" target="n-kernel"
+          style="edgeStyle=orthogonalEdgeStyle;fontSize=11;"
+          value="kc.execute(code) via ZMQ">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Jupyter Kernel → libs/sdk.py -->
+        <mxCell id="e10" edge="1" parent="1" source="n-kernel" target="n-sdk"
+          style="edgeStyle=orthogonalEdgeStyle;fontSize=11;"
+          value="from libs import sdk">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Jupyter Kernel → libs/github.py -->
+        <mxCell id="e11" edge="1" parent="1" source="n-kernel" target="n-github"
+          style="edgeStyle=orthogonalEdgeStyle;fontSize=11;"
+          value="from libs import github">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- kernel_exec.py → python.ts  [JSON stdout return, dashed purple, loops right] -->
+        <mxCell id="e12" edge="1" parent="1" source="n-kernexec" target="n-pyts"
+          style="edgeStyle=orthogonalEdgeStyle;dashed=1;fontSize=11;strokeColor=#9673a6;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=1;entryDx=0;entryDy=0;"
+          value="JSON stdout result">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1135" y="555" />
+              <mxPoint x="1135" y="455" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <!-- python.ts → Pi  [tool result appended to messages[], dashed purple] -->
+        <mxCell id="e13" edge="1" parent="1" source="n-pyts" target="n-pi"
+          style="edgeStyle=orthogonalEdgeStyle;dashed=1;fontSize=11;strokeColor=#9673a6;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;"
+          value="tool result → appended to messages[]">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Claude → User  [final answer streamed to TUI, dashed red, loops far left] -->
+        <mxCell id="e14" edge="1" parent="1" source="n-claude" target="n-user"
+          style="edgeStyle=orthogonalEdgeStyle;dashed=1;fontSize=11;strokeColor=#b85450;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;"
+          value="final answer streamed to TUI">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="220" y="670" />
+              <mxPoint x="220" y="70" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <!-- libs/sdk.py → log -->
+        <mxCell id="e15" edge="1" parent="1" source="n-sdk" target="n-log"
+          style="edgeStyle=orthogonalEdgeStyle;dashed=1;fontSize=10;strokeColor=#999999;"
+          value="writes">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- libs/github.py → log -->
+        <mxCell id="e16" edge="1" parent="1" source="n-github" target="n-log"
+          style="edgeStyle=orthogonalEdgeStyle;dashed=1;fontSize=10;strokeColor=#999999;"
+          value="writes">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

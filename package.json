@@ -1,0 +1,29 @@
+{
+  "name": "interactive-agent-using-pi",
+  "version": "1.0.0",
+  "description": "An interactive CLI agent built with the Claude Agent SDK that maintains conversation history and enables natural back-and-forth dialogue with Claude.",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "@mariozechner/pi-coding-agent": "^0.55.1",
+    "@sinclair/typebox": "^0.34.48"
+  },
+  "devDependencies": {
+    "@types/node": "^25.3.2",
+    "typescript": "^5.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/surya1729/claude-interactive-agent.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/surya1729/claude-interactive-agent/issues"
+  },
+  "homepage": "https://github.com/surya1729/claude-interactive-agent#readme"
+}
